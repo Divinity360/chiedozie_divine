@@ -14,10 +14,11 @@ class Helper {
     String text;
     final Directory directory = await getApplicationDocumentsDirectory();
     await new File(directory.path + Constants.CSV_FILE_PATH)
-        .create(recursive: true)
+        .create()
         .then((_) async {
       final File file = File(directory.path + Constants.CSV_FILE_PATH);
       await file.writeAsBytes(bytes);
+      text = "Writing csv to path";
     });
     return text;
   }

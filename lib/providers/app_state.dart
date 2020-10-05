@@ -34,21 +34,25 @@ class AppState with ChangeNotifier {
   }
 
   void _loadData() async {
-
+    _report = "Downloading csv from server";
     directory = await getApplicationDocumentsDirectory();
     var bytes = await apiService.downloadFile();
     if (bytes != null) {
-      populateCarOwner();
-      await apiService.getFilterations().then((value) {
-        _filtrationList = value;
+      _report = await helperClass.writeToPath(bytes).whenComplete(() {
         notifyListeners();
-      });
-    }
-//      helperClass.writeToPath(bytes).then((_) async {
-//
-//      });
 
-    else
+        print("Done");
+        populateCarOwner();
+        _report = "Reading csv from file";
+        notifyListeners();
+
+        apiService.getFilterations().then((value) {
+          _filtrationList = value;
+          notifyListeners();
+        });
+      });
+
+    } else
       print("File not found");
   }
 
@@ -63,9 +67,11 @@ class AppState with ChangeNotifier {
           .listen((String line) {
         // Process results.
         List row = line.split(',');
+        print(row.length);
         _allCarOwnersList.add(CarOwners.fromList(row)); // split by comma
       }, onDone: () {
         print(_allCarOwnersList);
+        print(_allCarOwnersList.length);
       });
     } catch (e) {
       print(e);
@@ -73,7 +79,8 @@ class AppState with ChangeNotifier {
   }
 
   filtrationCarOwnerList(Filteration filtration) async {
-    _filteredCarOwnersList = Helper.filtrationMethod(filtration, _allCarOwnersList);
+    _filteredCarOwnersList =
+        Helper.filtrationMethod(filtration, _allCarOwnersList);
     notifyListeners();
   }
 }

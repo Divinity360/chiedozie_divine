@@ -92,7 +92,7 @@ class _FilterScreenState extends State<FilterScreen> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
           LoadingBouncingLine.circle(backgroundColor: AppColors.PRIMARY_COLOR,),
-          BodyLightText("Fetching resources from server.")
+          BodyLightText(_appState.report)
         ],
       )),
     );
