@@ -15,7 +15,8 @@ class AppState with ChangeNotifier {
   ApiService apiService = new ApiService();
   Helper helperClass = new Helper();
   Directory directory;
-  String _report;
+  String _report = "";
+  File file;
   List<CarOwners> _allCarOwnersList = [];
   List<CarOwners> _filteredCarOwnersList = [];
   List<Filteration> _filtrationList = [];
@@ -38,14 +39,13 @@ class AppState with ChangeNotifier {
     directory = await getApplicationDocumentsDirectory();
     var bytes = await apiService.downloadFile();
     if (bytes != null) {
-      _report = await helperClass.writeToPath(bytes).whenComplete(() {
+      file = await helperClass.writeToPath(bytes).whenComplete(() {
         notifyListeners();
 
         print("Done");
-        populateCarOwner();
+        populateCarOwner(file);
         _report = "Reading csv from file";
         notifyListeners();
-
         apiService.getFilterations().then((value) {
           _filtrationList = value;
           notifyListeners();
@@ -56,10 +56,9 @@ class AppState with ChangeNotifier {
       print("File not found");
   }
 
-  Future populateCarOwner() async {
+  Future populateCarOwner(File file) async {
     try {
       final File file = File(directory.path + Constants.CSV_FILE_PATH);
-
       Stream<List> inputStream = file.openRead();
       inputStream
           .transform(utf8.decoder) // Decode bytes to UTF-8.

@@ -10,17 +10,16 @@ import 'package:path_provider/path_provider.dart';
 
 class Helper {
   // Creates new file in path if none is existing and writes data to it
-  Future<String> writeToPath(var bytes) async {
-    String text;
+  Future<File> writeToPath(var bytes) async {
+    File returnFile;
     final Directory directory = await getApplicationDocumentsDirectory();
-    await new File(directory.path + Constants.CSV_FILE_PATH)
-        .create()
-        .then((_) async {
-      final File file = File(directory.path + Constants.CSV_FILE_PATH);
+    await File(directory.path + Constants.CSV_FILE_PATH)
+        .create(recursive: true)
+        .then((File file) async {
       await file.writeAsBytes(bytes);
-      text = "Writing csv to path";
+      returnFile = file;
     });
-    return text;
+    return returnFile;
   }
 
   // Reads csv previously stored in device
